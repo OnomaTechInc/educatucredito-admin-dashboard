@@ -19,6 +19,12 @@ if (process.env.NODE_ENV === 'development') {
 } else {
   window.apiLink = 'https://api.educatucredito.com/v1/admin/'
 }
+window.avatarColor = {
+  Administrator: 'red',
+  Broker: 'pink',
+  Customer: 'teal'
+}
+
 // add cordova.js only if serving the app through file://
 if (window.location.protocol === 'file:' || window.location.port === '3000') {
   var cordovaScript = document.createElement('script')

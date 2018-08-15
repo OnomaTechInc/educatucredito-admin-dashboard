@@ -6,6 +6,8 @@ import PageNotFound from '@/components/404'
 import Users from '@/components/Users'
 import Videos from '@/components/Videos'
 import Agents from '@/components/Agents'
+import Accounts from '@/components/Accounts'
+import News from '@/components/News'
 
 Vue.use(Router)
 
@@ -63,6 +65,18 @@ export default new Router({
       path: '/agents',
       name: 'Agents',
       component: Agents,
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/accounts',
+      name: 'Chart Accounts',
+      component: Accounts,
+      beforeEnter: requireAuth
+    },
+    {
+      path: '/news',
+      name: 'News',
+      component: News,
       beforeEnter: requireAuth
     },
     {

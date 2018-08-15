@@ -5,7 +5,7 @@
         <v-card class="header" flat>
           <v-card-title>
           <!-- <v-flex xs12 sm6 md6> -->
-            <h2>Agents Management</h2>
+            <h2>Chart Accounts Management</h2>
             <!-- <v-spacer></v-spacer> -->
           </v-card-title>
         </v-card>
@@ -19,35 +19,8 @@
                 persistent
                 scrollable
               >
-                <v-btn 
-                  slot="activator" 
-                  color="primary" 
-                  dark 
-                  class="mb-2">
-                  Create New Agent
-                  <v-icon right dark>person_add</v-icon>
-                </v-btn>
                 <v-card style="height: 500px;">
                   <v-card-title>
-                    <v-avatar
-                      class="float_atop"
-                      slot="activator"
-                      color="green"
-                      size="120"
-                      style="background: #fff"
-                      light
-                      @click="uploadPhoto"
-                    >
-                      <img
-                        title="click here to change photo"
-                        v-if="editedItem.avatar"
-                        :src="editedItem.avatar"
-                        alt=""
-                      >
-                      <span title="click here to upload photo" class="white--text" style="font-size: 84px" v-else-if="editedItem.name">{{ initials(editedItem.name) }}</span>
-                      <span title="click here to upload photo" class="black--text" v-else><v-icon size="120">account_circle</v-icon></span>
-                    </v-avatar>
-                    <upload-btn :fileChangedCallback="loadPhoto" style="display:none"></upload-btn>
                     <span class="headline">{{ formTitle }}</span>
                   </v-card-title>
                   <v-card-text>
@@ -62,22 +35,22 @@
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.email" 
-                            label="Email"
-                            prepend-icon="mail" 
+                            v-model="editedItem.duedate" 
+                            label="Due Date"
+                            prepend-icon="calendar" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.contact" 
-                            label="Contact Number"
+                            v-model="editedItem.amount" 
+                            label="Amount"
                             prepend-icon="phone" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.address" 
-                            label="Address"
+                            v-model="editedItem.file" 
+                            label="File"
                             prepend-icon="room" 
                           ></v-text-field>
                         </v-flex>
@@ -108,26 +81,9 @@
             >
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
               <template slot="items" slot-scope="props">
-                <td>
-                  <v-chip>
-                    <v-avatar
-                      size="36px"
-                      color="green"
-                      light
-                    >
-                      <img
-                        v-if="props.item.avatar"
-                        :src="props.item.avatar"
-                        alt=""
-                      >
-                      <span class="white--text headline" v-else>{{ initials(props.item.name) }}</span>
-                    </v-avatar>
-                <!-- </td>
-                <td> -->
-                    {{ props.item.name }}
-                  </v-chip>
-                </td>
-                <td class="text-xs-left">{{ props.item.email }}</td>
+                <td class="text-xs-left">{{ props.item.name }}</td>
+                <td class="text-xs-left">{{ props.item.duedate }}</td>
+                <td class="text-xs-left">{{ props.item.amount }}</td>
                 <td class="justify-center layout px-0">
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-icon color="teal">edit</v-icon>
@@ -247,7 +203,8 @@ a {
             align: 'left',
             value: 'name'
           },
-          { text: 'Email', value: 'email' },
+          { text: 'Due Date', value: 'duedate' },
+          { text: 'Amount', value: 'amount' },
           { text: 'Actions', value: 'name', sortable: false }
         ],
         editedIndex: -1,
@@ -292,12 +249,17 @@ a {
     created () {
       this.initialize()
     },
-    mounted ()   {
-      this.photoIsLoaded = false
-    },
     methods: {
       uploadPhoto () {
         document.getElementById('uploadFile').click()
+      },
+
+      getColor (v) {
+        if (v === '') {
+          return 'lightgray'
+        } else {
+          return window.avatarColor[v]
+        }
       },
 
       initialize () {
@@ -314,8 +276,8 @@ a {
               name: response.data.result[x].name,
               avatar: response.data.result[x].user_image,
               email: response.data.result[x].email,
-              contact: response.data.result[x].contact_number,
-              address: response.data.result[x].location
+              contact: response.data.result[x].company,
+              address: response.data.result[x].position
             })
           }
           d.loading = false
@@ -393,8 +355,8 @@ a {
           axios.put(`${window.apiLink}agents/${d.editedItem.id}`, {
             email: d.editedItem.email,
             name: d.editedItem.name,
-            contact_number: d.editedItem.contact,
-            location: d.editedItem.address
+            contact: d.editedItem.contact,
+            address: d.editedItem.address
           }).then(function (res) {
             O.assign(d.items[d.editedIndex], d.editedItem)
             d.$emit('receiveAlertMessage', {
@@ -420,8 +382,8 @@ a {
           axios.post(`${window.apiLink}agents/`, {
             email: d.editedItem.email,
             name: d.editedItem.name,
-            contact_number: d.editedItem.contact,
-            location: d.editedItem.address
+            contact: d.editedItem.contact,
+            address: d.editedItem.address
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)
             d.items.push(d.editedItem)

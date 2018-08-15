@@ -5,7 +5,7 @@
         <v-card class="header" flat>
           <v-card-title>
           <!-- <v-flex xs12 sm6 md6> -->
-            <h2>Agents Management</h2>
+            <h2>News Management</h2>
             <!-- <v-spacer></v-spacer> -->
           </v-card-title>
         </v-card>
@@ -24,30 +24,11 @@
                   color="primary" 
                   dark 
                   class="mb-2">
-                  Create New Agent
-                  <v-icon right dark>person_add</v-icon>
+                  Create New Entry
+                  <v-icon right dark>add</v-icon>
                 </v-btn>
                 <v-card style="height: 500px;">
                   <v-card-title>
-                    <v-avatar
-                      class="float_atop"
-                      slot="activator"
-                      color="green"
-                      size="120"
-                      style="background: #fff"
-                      light
-                      @click="uploadPhoto"
-                    >
-                      <img
-                        title="click here to change photo"
-                        v-if="editedItem.avatar"
-                        :src="editedItem.avatar"
-                        alt=""
-                      >
-                      <span title="click here to upload photo" class="white--text" style="font-size: 84px" v-else-if="editedItem.name">{{ initials(editedItem.name) }}</span>
-                      <span title="click here to upload photo" class="black--text" v-else><v-icon size="120">account_circle</v-icon></span>
-                    </v-avatar>
-                    <upload-btn :fileChangedCallback="loadPhoto" style="display:none"></upload-btn>
                     <span class="headline">{{ formTitle }}</span>
                   </v-card-title>
                   <v-card-text>
@@ -55,30 +36,24 @@
                       <v-layout wrap>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.name" 
-                            label="Name"
-                            prepend-icon="person" 
+                            v-model="editedItem.headline" 
+                            label="Headline"
+                            prepend-icon="headline" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.email" 
-                            label="Email"
-                            prepend-icon="mail" 
+                            v-model="editedItem.subheader" 
+                            label="Subheader"
+                            prepend-icon="sub" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
-                            v-model="editedItem.contact" 
-                            label="Contact Number"
-                            prepend-icon="phone" 
-                          ></v-text-field>
-                        </v-flex>
-                        <v-flex xs12 sm12 md12>
-                          <v-text-field 
-                            v-model="editedItem.address" 
-                            label="Address"
-                            prepend-icon="room" 
+                            v-model="editedItem.content" 
+                            label="Content"
+                            multi-line
+                            prepend-icon="content" 
                           ></v-text-field>
                         </v-flex>
                       </v-layout>
@@ -108,26 +83,9 @@
             >
               <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
               <template slot="items" slot-scope="props">
-                <td>
-                  <v-chip>
-                    <v-avatar
-                      size="36px"
-                      color="green"
-                      light
-                    >
-                      <img
-                        v-if="props.item.avatar"
-                        :src="props.item.avatar"
-                        alt=""
-                      >
-                      <span class="white--text headline" v-else>{{ initials(props.item.name) }}</span>
-                    </v-avatar>
-                <!-- </td>
-                <td> -->
-                    {{ props.item.name }}
-                  </v-chip>
-                </td>
-                <td class="text-xs-left">{{ props.item.email }}</td>
+                <td class="text-xs-left">{{ props.item.headline }}</td>
+                <td class="text-xs-left">{{ props.item.subheader }}</td>
+                <td class="text-xs-left">{{ props.item.excerpt }}</td>
                 <td class="justify-center layout px-0">
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-icon color="teal">edit</v-icon>
@@ -242,12 +200,9 @@ a {
         items: [],
         headers: [
           // { text: 'Avatar', value: 'avatar' },
-          {
-            text: 'Name',
-            align: 'left',
-            value: 'name'
-          },
-          { text: 'Email', value: 'email' },
+          { text: 'Headline', value: 'headline' },
+          { text: 'Subheader', value: 'subheader' },
+          { text: 'Excerpt', value: 'excerpt' },
           { text: 'Actions', value: 'name', sortable: false }
         ],
         editedIndex: -1,
@@ -265,57 +220,37 @@ a {
           address: '',
           avatar: ''
         },
-        photoIsLoaded: false,
-        session: '',
-        loadPhoto: function (val) {
-          var reader = new FileReader()
-          var d = this
-          reader.onload = function (event) {
-            d.$parent.$parent.$parent.$parent.editedItem.avatar = event.target.result
-          }
-          reader.readAsDataURL(val)
-          d.$parent.$parent.$parent.$parent.photoIsLoaded = true
-        }
+        session: ''
       }
     },
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Agent' : 'Edit Agent'
+        return this.editedIndex === -1 ? 'New Entry' : 'Edit Entry'
       }
     },
     watch: {
       dialog (val) {
-        this.photoIsLoaded = true
         val || this.close()
       }
     },
     created () {
       this.initialize()
     },
-    mounted ()   {
-      this.photoIsLoaded = false
-    },
     methods: {
-      uploadPhoto () {
-        document.getElementById('uploadFile').click()
-      },
-
       initialize () {
         var d = this
         this.session = JSON.parse(localStorage.getItem('session'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
-        axios.get(window.apiLink + 'agents').then(function (response) {
+        axios.get(window.apiLink + 'news').then(function (response) {
           // localStorage.setItem('session', JSON.stringify(response.data))
           // d.$emit('setRoleName', response.data)
           var items = []
           for (var x = 0; x < response.data.result.length; x++) {
             items.push({
               id: response.data.result[x].id,
-              name: response.data.result[x].name,
-              avatar: response.data.result[x].user_image,
-              email: response.data.result[x].email,
-              contact: response.data.result[x].contact_number,
-              address: response.data.result[x].location
+              headline: response.data.result[x].headline,
+              subheader: response.data.result[x].subheader,
+              content: response.data.result[x].content
             })
           }
           d.loading = false
@@ -359,11 +294,11 @@ a {
         }).then(confirmation => {
           if (confirmation) {
             axios.delete(
-              `${window.apiLink}agents/${item.id}`
+              `${window.apiLink}news/${item.id}`
             ).then(function (res) {
               d.items.splice(index, 1)
               d.$emit('receiveAlertMessage', {
-                body: 'Agent has been successfully removed.',
+                body: 'News has been successfully removed.',
                 type: 'success',
                 id: uuid.v4()
               })
@@ -390,58 +325,36 @@ a {
         data.append('file', document.getElementById('uploadFile').files[0])
         if (this.editedIndex > -1) {
           // O.assign(d.items[d.editedIndex], d.editedItem)
-          axios.put(`${window.apiLink}agents/${d.editedItem.id}`, {
-            email: d.editedItem.email,
-            name: d.editedItem.name,
-            contact_number: d.editedItem.contact,
-            location: d.editedItem.address
+          axios.put(`${window.apiLink}news/${d.editedItem.id}`, {
+            headline: d.editedItem.headline,
+            subheader: d.editedItem.subheader,
+            content: d.editedItem.content
           }).then(function (res) {
             O.assign(d.items[d.editedIndex], d.editedItem)
             d.$emit('receiveAlertMessage', {
-              body: 'Agent has been successfully save.',
+              body: 'News has been successfully save.',
               type: 'success',
               id: uuid.v4()
             })
             d.close()
-            if (d.photoIsLoaded === true) {
-              axios.post(
-                `${window.apiLink}agents/photo/${d.editedItem.id}`,
-                data
-              ).then(function (res2) {
-              }).catch(function (error2) {
-                console.log('error: ', error2)
-              })
-              d.photoIsLoaded = false
-            }
           }).catch(function (error) {
             console.log('error: ', error)
           })
         } else {
-          axios.post(`${window.apiLink}agents/`, {
-            email: d.editedItem.email,
-            name: d.editedItem.name,
-            contact_number: d.editedItem.contact,
-            location: d.editedItem.address
+          axios.post(`${window.apiLink}news/`, {
+            headline: d.editedItem.headline,
+            subheader: d.editedItem.subheader,
+            content: d.editedItem.content
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)
             d.items.push(d.editedItem)
             // console.log('items: ', d.items)
             d.$emit('receiveAlertMessage', {
-              body: 'Agent has been successfully save.',
+              body: 'News has been successfully save.',
               type: 'success',
               id: uuid.v4()
             })
             d.close()
-            if (d.photoIsLoaded === true) {
-              axios.post(
-                `${window.apiLink}agents/upload/${res.data.last_insert_id}`,
-                data
-              ).then(function (res2) {
-              }).catch(function (error2) {
-                console.log('error: ', error2)
-              })
-              d.photoIsLoaded = false
-            }
           }).catch(function (error) {
             console.log('error: ', error)
           })

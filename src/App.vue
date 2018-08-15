@@ -46,7 +46,7 @@
         <v-menu offset-y>
           <v-btn icon slot="activator">
             <v-badge color="orange" overlap>
-              <span class="white--text" slot="badge">3</span>
+              <!-- <span class="white--text" slot="badge">3</span> -->
                 <v-icon light>notifications</v-icon>
             </v-badge>
           </v-btn>
@@ -104,13 +104,7 @@
   export default {
     data () {
       return {
-        notifItems: [{
-          title: 'Welcome!'
-        }, {
-          title: 'Hey its meee!'
-        }, {
-          title: 'the quick brown fox!'
-        }],
+        notifItems: [{title: 'Nothing yet.'}],
         sheet: true,
         direction: 'top',
         fab: false,
@@ -144,6 +138,15 @@
     },
     created () {
       let session = JSON.parse(window.localStorage.getItem('session'))
+      // this.notifItems = [
+      //   {
+      //     title: 'Welcome!'
+      //   }, {
+      //     title: 'Hey its meee!'
+      //   }, {
+      //     title: 'the quick brown fox!'
+      //   }
+      // ]
       // console.log(session)
       if (session !== undefined && session !== null) {
         this.name = session.name
@@ -221,6 +224,11 @@
             title: 'Agents',
             link: '/agents'
           },
+          {
+            icon: 'cast',
+            title: 'News',
+            link: '/news'
+          }
         ]
       },
       logout () {

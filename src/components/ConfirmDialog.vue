@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="confirmer.active" max-width="290">
+  <v-dialog :value="confirmer.active" persistent max-width="290">
     <v-card>
       <v-card-title class="headline">{{ confirmer.title }}</v-card-title>
       <v-card-text>{{ confirmer.body }}</v-card-text>

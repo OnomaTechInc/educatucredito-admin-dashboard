@@ -91,6 +91,16 @@
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
+                          <v-select
+                            :items="agentItems"
+                            item-text="name"
+                            item-value="id"
+                            v-model="editedItem.agent" 
+                            label="Agent"
+                            prepend-icon="assignment_ind" 
+                          ></v-select>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
                           <v-btn v-show="editedIndex > -1" color="error" @click="resetPasswd" block>Reset password</v-btn>
                         </v-flex>
                       </v-layout>
@@ -141,6 +151,7 @@
                 </td>
                 <td class="text-xs-left">{{ props.item.email }}</td>
                 <td class="text-xs-left">{{ props.item.role }}</td>
+                <td class="text-xs-left">{{ props.item.agent }}</td>
                 <td class="justify-center layout px-0">
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-icon color="teal">edit</v-icon>
@@ -247,6 +258,7 @@ a {
   export default {
     data () {
       return {
+        agentItems: [],
         dialog: false,
         loading: true,
         search: '',
@@ -261,6 +273,7 @@ a {
           },
           { text: 'Email', value: 'email' },
           { text: 'Role', value: 'role' },
+          { text: 'Agent', value: 'agent' },
           { text: 'Actions', value: 'name', sortable: false }
         ],
         editedIndex: -1,
@@ -270,7 +283,8 @@ a {
           role: '',
           company: '',
           position: '',
-          avatar: ''
+          avatar: '',
+          agent: ''
         },
         defaultItem: {
           name: '',
@@ -278,7 +292,8 @@ a {
           role: '',
           company: '',
           position: '',
-          avatar: ''
+          avatar: '',
+          agent: ''
         },
         photoIsLoaded: false,
         session: '',
@@ -337,6 +352,16 @@ a {
         var d = this
         this.session = JSON.parse(localStorage.getItem('session'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
+        axios.get(window.apiLink + 'agents').then(function (response) {
+          for (var z = 0; z < response.data.result.length; z++) {
+            d.agentItems.push({
+              name: response.data.result[z].name,
+              id: response.data.result[z].id
+            })
+          }
+        }).catch(function (error) {
+          console.log(error)
+        })
         axios.get(window.apiLink + 'users').then(function (response) {
           // localStorage.setItem('session', JSON.stringify(response.data))
           // d.$emit('setRoleName', response.data)
@@ -349,11 +374,13 @@ a {
               email: response.data.result[x].email,
               company: response.data.result[x].company,
               position: response.data.result[x].position,
-              role: response.data.result[x].role
+              role: response.data.result[x].role,
+              agent: response.data.result[x].agent.name
             })
           }
           d.loading = false
           d.items = items
+          // console.log('aaa')
         }).catch(function (error) {
           console.log(error)
           if (error.response !== undefined && error.response.status === 422) {
@@ -429,6 +456,7 @@ a {
             name: d.editedItem.name,
             company: d.editedItem.company,
             position: d.editedItem.position,
+            agent: d.editItem.agent,
             role: d.editedItem.role
           }).then(function (res) {
             O.assign(d.items[d.editedIndex], d.editedItem)
@@ -457,6 +485,7 @@ a {
             name: d.editedItem.name,
             company: d.editedItem.company,
             position: d.editedItem.position,
+            agent: d.editItem.agent,
             role: d.editedItem.role
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)
