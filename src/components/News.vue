@@ -14,7 +14,7 @@
             <v-card-title>
               <v-dialog 
                 v-model="dialog" 
-                max-width="500px"
+                max-width="600px"
                 content-class="overflow_visible"
                 persistent
                 scrollable
@@ -24,7 +24,7 @@
                   color="primary" 
                   dark 
                   class="mb-2">
-                  Create New Entry
+                  Create New Article
                   <v-icon right dark>add</v-icon>
                 </v-btn>
                 <v-card style="height: 500px;">
@@ -38,23 +38,31 @@
                           <v-text-field 
                             v-model="editedItem.headline" 
                             label="Headline"
-                            prepend-icon="headline" 
+                            prepend-icon="view_headline" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
                             v-model="editedItem.subheader" 
                             label="Subheader"
-                            prepend-icon="sub" 
+                            prepend-icon="subtitles" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
-                          <v-text-field 
+                          <v-textarea 
+                            v-model="editedItem.excerpt" 
+                            label="Excerpt"
+                            prepend-icon="format_quote" 
+                          ></v-textarea>
+                        </v-flex>
+                        <v-flex xs12 sm12 md12>
+                          <!-- <v-text-field 
                             v-model="editedItem.content" 
                             label="Content"
                             multi-line
                             prepend-icon="content" 
-                          ></v-text-field>
+                          ></v-text-field> -->
+                          <wysiwyg v-model="editedItem.content" />
                         </v-flex>
                       </v-layout>
                     </v-container>
@@ -108,6 +116,7 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+@import '/static/css/vueWYSIWYG.css';
 @-moz-keyframes loader {
   from {
     transform: rotate(0);
@@ -225,7 +234,7 @@ a {
     },
     computed: {
       formTitle () {
-        return this.editedIndex === -1 ? 'New Entry' : 'Edit Entry'
+        return this.editedIndex === -1 ? 'New Article' : 'Edit Article'
       }
     },
     watch: {
@@ -250,6 +259,7 @@ a {
               id: response.data.result[x].id,
               headline: response.data.result[x].headline,
               subheader: response.data.result[x].subheader,
+              excerpt: response.data.result[x].excerpt,
               content: response.data.result[x].content
             })
           }
@@ -311,7 +321,7 @@ a {
 
       close () {
         this.dialog = false
-        document.getElementById('uploadFile').value = ''
+        // document.getElementById('uploadFile').value = ''
         setTimeout(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
@@ -322,12 +332,13 @@ a {
         var data = new FormData()
         var d = this
         var O = Object
-        data.append('file', document.getElementById('uploadFile').files[0])
+        // data.append('file', document.getElementById('uploadFile').files[0])
         if (this.editedIndex > -1) {
           // O.assign(d.items[d.editedIndex], d.editedItem)
           axios.put(`${window.apiLink}news/${d.editedItem.id}`, {
             headline: d.editedItem.headline,
             subheader: d.editedItem.subheader,
+            excerpt: d.editedItem.excerpt,
             content: d.editedItem.content
           }).then(function (res) {
             O.assign(d.items[d.editedIndex], d.editedItem)
@@ -344,6 +355,7 @@ a {
           axios.post(`${window.apiLink}news/`, {
             headline: d.editedItem.headline,
             subheader: d.editedItem.subheader,
+            excerpt: d.editedItem.excerpt,
             content: d.editedItem.content
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)

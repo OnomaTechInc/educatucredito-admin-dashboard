@@ -33,26 +33,21 @@
                     <v-container grid-list-md>
                       <v-layout wrap>
                         <v-flex xs12 sm12 md12>
-                          <v-text-field 
-                            v-model="editedItem.video" 
-                            label="Video"
-                            prepend-icon="video" 
-                          ></v-text-field>
+                          <v-btn class="primary" @click="dialog2 = true">Upload video</v-btn>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
                             v-model="editedItem.title" 
                             label="Title"
-                            prepend-icon="sub" 
+                            prepend-icon="view_headline" 
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
-                          <v-text-field 
+                          <v-textarea 
                             v-model="editedItem.description" 
                             label="Description"
-                            multi-line
-                            prepend-icon="content" 
-                          ></v-text-field>
+                            prepend-icon="description" 
+                          ></v-textarea>
                         </v-flex>
                       </v-layout>
                     </v-container>
@@ -84,6 +79,9 @@
                 <td class="text-xs-left">{{ props.item.title }}</td>
                 <td class="text-xs-left">{{ props.item.description }}</td>
                 <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" @click="watchItem(props.item)">
+                    <v-icon color="green">play_circle_outline</v-icon>
+                  </v-btn>
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-icon color="teal">edit</v-icon>
                   </v-btn>
@@ -100,6 +98,60 @@
         </v-container>
       </v-layout>
     </v-slide-y-transition>
+    <v-dialog 
+      v-model='dialog2'
+      fullscreen
+      transition='dialog-bottom-transition'
+      scrollable
+    >
+      <v-card tile>
+        <v-toolbar card dark color='primary'>
+          <v-btn icon @click.native='dialog2 = false' dark>
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Drag and drop video here</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-toolbar-items>
+            <v-btn dark flat @click.native='uploadInit'>Start Upload</v-btn>
+          </v-toolbar-items>
+        </v-toolbar>
+        <v-progress-linear :indeterminate='true' v-if='startUpload'></v-progress-linear>
+        <v-card-text>
+          <picture-input
+            id='uploadFile' 
+            v-if='dialog2' 
+            width='600' 
+            height='600' 
+            ref='pictureInput' 
+            margin='16' 
+            change='Change Video'
+            remove='Remove Video'
+            @change='onChange'
+            accept='video/mp4,video/webm' 
+            size='10' 
+            buttonClass='btn theme--dark primary pa-2'
+            removeButtonClass='btn theme--dark secondary pa-2'
+            :removable='true'
+            :customStrings='customStrings'>
+          </picture-input>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <v-dialog 
+      v-model='dialog3'
+      scrollable
+      max-width="600px"
+    >
+      <v-card>
+        <video-player
+          class="video-player-box"
+          ref="videoPlayer"
+          :options="playerOptions"
+          :playsinline="true"
+        >
+        </video-player>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -143,9 +195,27 @@ a {
   import axios from 'axios'
   import {uuid} from 'vue-uuid'
   import UploadButton from 'vuetify-upload-button'
+  import PictureInput from 'vue-picture-input'
+  import { videoPlayer } from 'vue-video-player'
+  import 'video.js/dist/video-js.css'
   export default {
     data () {
       return {
+        playerOptions: {
+          muted: false,
+          fluid: true,
+          language: 'en',
+          playbackRates: [0.7, 1.0, 1.5, 2.0],
+          sources: [{
+            type: 'video/mp4',
+            src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
+          }]
+        },
+        video: '',
+        customStrings: {'upload': '<p>Your device does not support file uploading.</p>', 'drag': 'Drag video here'},
+        startUpload: false,
+        dialog3: false,
+        dialog2: false,
         dialog: false,
         loading: true,
         search: '',
@@ -197,6 +267,22 @@ a {
       this.initialize()
     },
     methods: {
+      uploadInit () {
+        console.log('uploading...')
+        this.dialog3 = false
+      },
+
+      onChange (video) {
+        // console.log(image)
+        // console.log('New picture selected!')
+        if (video) {
+          // console.log('Picture loaded.')
+          this.video = video
+        } else {
+          console.log('FileReader API not supported: use the <form>, Luke!')
+        }
+      },
+      
       uploadPhoto () {
         document.getElementById('uploadFile').click()
       },
@@ -249,6 +335,11 @@ a {
         } else {
           return '?'
         }
+      },
+
+      watchItem (item) {
+        this.dialog3 = true
+        this.playerOptions.sources[0].src = item.video
       },
 
       editItem (item) {
@@ -356,7 +447,9 @@ a {
       }
     },
     components: {
-      'upload-btn': UploadButton
+      'upload-btn': UploadButton,
+      PictureInput,
+      videoPlayer
     }
   }
 </script>

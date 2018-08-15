@@ -8,11 +8,13 @@ import VueHead from 'vue-head'
 import store from './store'
 import App from './App'
 import router from './router'
+import wysiwyg from 'vue-wysiwyg'
 
 Vue.use(Vuetify)
 Vue.config.productionTip = false
 Vue.use(VueCordova)
 Vue.use(VueHead)
+Vue.use(wysiwyg, {})
 
 if (process.env.NODE_ENV === 'development') {
   window.apiLink = 'https://api.educatucredito.com/v1/admin/'

@@ -95,6 +95,9 @@
           <span class="pl-2">&copy; 2018</span>
       </v-footer>
     </div>
+    <v-content v-if="$route.meta.plainLayout">
+      <router-view @setRoleName="processNameRole" @receiveAlertMessage="alertMessage = $event"/>
+    </v-content>
   </v-app>
 </template>
 

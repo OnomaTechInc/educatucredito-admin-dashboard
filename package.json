@@ -29,8 +29,11 @@
     "vue": "^2.5.16",
     "vue-cordova": "^0.1.2",
     "vue-head": "^2.0.12",
+    "vue-picture-input": "^2.1.6",
     "vue-router": "^3.0.1",
     "vue-uuid": "^1.0.0",
+    "vue-video-player": "^5.0.2",
+    "vue-wysiwyg": "^1.7.2",
     "vuetify": "^1.0.18",
     "vuetify-upload-button": "^0.1.2",
     "vuex": "^3.0.1"

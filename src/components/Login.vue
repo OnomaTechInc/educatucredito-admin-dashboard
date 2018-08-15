@@ -37,7 +37,6 @@
                     <v-btn type="submit" color="primary">Login</v-btn>
                 </v-card-actions>
             </v-form>
-            <div class="below_box" align="center"><a href="/#/register">New user? Create your account</a></div>
         </v-card>
         </v-flex>
     </v-layout>
