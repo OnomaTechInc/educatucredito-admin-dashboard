@@ -209,7 +209,7 @@ body {
       margin-top: 10px;
       color: #fff;
       text-align: center;
-      display: inline;
+      display: inline-block;
   }
   .section3 h1 {
     font-size: 64.5px;
@@ -350,6 +350,19 @@ body {
         color: #fff;
       }
 
+  /* news */
+  .v-input__control{
+    padding:0 15px !important;
+  }
+  .newsList{
+    padding: 0 15px;
+  }  
+  /* news */
+  /* video */
+  .videoList{
+    padding: 0 15px;
+  }
+  /* video */
 
 @media(max-width:992px){
   #registerform {
