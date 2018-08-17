@@ -83,7 +83,7 @@
                 hide-details
               ></v-text-field>
             </v-card-title>
-            <v-data-table
+            <v-data-table class="newsList"
               :headers="headers"
               :items="items"
               :loading="loading"

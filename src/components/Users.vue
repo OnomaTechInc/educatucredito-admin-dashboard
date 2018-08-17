@@ -350,6 +350,7 @@ a {
 
       initialize () {
         var d = this
+        var agentName=''
         this.session = JSON.parse(localStorage.getItem('session'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
         axios.get(window.apiLink + 'agents').then(function (response) {
@@ -363,6 +364,7 @@ a {
           console.log(error)
         })
         axios.get(window.apiLink + 'users').then(function (response) {
+          console.log(response)
           // localStorage.setItem('session', JSON.stringify(response.data))
           // d.$emit('setRoleName', response.data)
           var items = []
