@@ -116,7 +116,6 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-@import '/static/css/vueWYSIWYG.css';
 @-moz-keyframes loader {
   from {
     transform: rotate(0);
@@ -200,6 +199,7 @@ a {
   import axios from 'axios'
   import {uuid} from 'vue-uuid'
   import UploadButton from 'vuetify-upload-button'
+  import 'vue-wysiwyg/dist/vueWysiwyg.css'
   export default {
     data () {
       return {

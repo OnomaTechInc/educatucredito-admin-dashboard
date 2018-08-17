@@ -129,8 +129,8 @@
             @change='onChange'
             accept='video/mp4,video/webm' 
             size='10' 
-            buttonClass='btn theme--dark primary pa-2'
-            removeButtonClass='btn theme--dark secondary pa-2'
+            buttonClass='btn theme--dark primary pa-2 white--text'
+            removeButtonClass='btn theme--dark secondary pa-2 white--text'
             :removable='true'
             :customStrings='customStrings'>
           </picture-input>
@@ -212,7 +212,12 @@ a {
           }]
         },
         video: '',
-        customStrings: {'upload': '<p>Your device does not support file uploading.</p>', 'drag': 'Drag video here'},
+        customStrings: {
+          'upload': '<p>Your device does not support file uploading.</p>', 
+          'drag': 'Drag video here',
+          'change': 'Change Video',
+          'remove': 'Remove Video'
+        },
         startUpload: false,
         dialog3: false,
         dialog2: false,
@@ -269,7 +274,7 @@ a {
     methods: {
       uploadInit () {
         console.log('uploading...')
-        this.dialog3 = false
+        this.dialog2 = false
       },
 
       onChange (video) {
