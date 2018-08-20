@@ -91,16 +91,6 @@
                           ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
-                          <v-select
-                            :items="agentItems"
-                            item-text="name"
-                            item-value="id"
-                            v-model="editedItem.agent" 
-                            label="Agent"
-                            prepend-icon="assignment_ind" 
-                          ></v-select>
-                        </v-flex>
-                        <v-flex xs12 sm12 md12>
                           <v-btn v-show="editedIndex > -1" color="error" @click="resetPasswd" block>Reset password</v-btn>
                         </v-flex>
                       </v-layout>
@@ -151,8 +141,10 @@
                 </td>
                 <td class="text-xs-left">{{ props.item.email }}</td>
                 <td class="text-xs-left">{{ props.item.role }}</td>
-                <td class="text-xs-left">{{ props.item.agent }}</td>
                 <td class="justify-center layout px-0">
+                  <v-btn icon class="mx-0" @click="loginTo(props.item)">
+                    <v-icon color="primary">vpn_key</v-icon>
+                  </v-btn>
                   <v-btn icon class="mx-0" @click="editItem(props.item)">
                     <v-icon color="teal">edit</v-icon>
                   </v-btn>
@@ -169,6 +161,26 @@
         </v-container>
       </v-layout>
     </v-slide-y-transition>
+    <v-dialog 
+      v-model="dialog4" 
+      fullscreen
+      hide-overlay 
+      transition="dialog-bottom-transition"
+      scrollable
+    >
+      <v-card>
+        <v-toolbar dark color="primary">
+          <v-btn icon dark @click.native="dialog4 = false">
+            <v-icon>close</v-icon>
+          </v-btn>
+          <v-toolbar-title>Users Dashboard</v-toolbar-title>
+          <v-spacer></v-spacer>
+        </v-toolbar>
+
+        <iframe width="100%" height="100%" frameborder="0" src="https://www.educatucredito.com/user/#/dashboard">
+        </iframe>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -258,8 +270,8 @@ a {
   export default {
     data () {
       return {
-        agentItems: [],
         dialog: false,
+        dialog4: false,
         loading: true,
         search: '',
         roleItems: ['Administrator', 'Broker', 'Customer'],
@@ -273,7 +285,6 @@ a {
           },
           { text: 'Email', value: 'email' },
           { text: 'Role', value: 'role' },
-          { text: 'Agent', value: 'agent' },
           { text: 'Actions', value: 'name', sortable: false }
         ],
         editedIndex: -1,
@@ -283,8 +294,7 @@ a {
           role: '',
           company: '',
           position: '',
-          avatar: '',
-          agent: ''
+          avatar: ''
         },
         defaultItem: {
           name: '',
@@ -292,8 +302,7 @@ a {
           role: '',
           company: '',
           position: '',
-          avatar: '',
-          agent: ''
+          avatar: ''
         },
         photoIsLoaded: false,
         session: '',
@@ -350,19 +359,8 @@ a {
 
       initialize () {
         var d = this
-        var agentName=''
-        this.session = JSON.parse(localStorage.getItem('session'))
+        this.session = JSON.parse(localStorage.getItem('adminsession'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
-        axios.get(window.apiLink + 'agents').then(function (response) {
-          for (var z = 0; z < response.data.result.length; z++) {
-            d.agentItems.push({
-              name: response.data.result[z].name,
-              id: response.data.result[z].id
-            })
-          }
-        }).catch(function (error) {
-          console.log(error)
-        })
         axios.get(window.apiLink + 'users').then(function (response) {
           console.log(response)
           // localStorage.setItem('session', JSON.stringify(response.data))
@@ -376,8 +374,7 @@ a {
               email: response.data.result[x].email,
               company: response.data.result[x].company,
               position: response.data.result[x].position,
-              role: response.data.result[x].role,
-              agent: response.data.result[x].agent.name
+              role: response.data.result[x].role
             })
           }
           d.loading = false
@@ -390,7 +387,7 @@ a {
             // d.errorMessage = error.response.data.username
           } else {
             d.$emit('receiveAlertMessage', {
-              body: error.response.statusText,
+              body: 'Oops! Something went wrong.',
               type: 'error',
               id: uuid.v4()
             })
@@ -405,6 +402,11 @@ a {
         } else {
           return '?'
         }
+      },
+
+      loginTo (item) {
+        // asa
+        this.dialog4 = true
       },
 
       editItem (item) {
@@ -458,7 +460,6 @@ a {
             name: d.editedItem.name,
             company: d.editedItem.company,
             position: d.editedItem.position,
-            agent: d.editItem.agent,
             role: d.editedItem.role
           }).then(function (res) {
             O.assign(d.items[d.editedIndex], d.editedItem)
@@ -487,7 +488,6 @@ a {
             name: d.editedItem.name,
             company: d.editedItem.company,
             position: d.editedItem.position,
-            agent: d.editItem.agent,
             role: d.editedItem.role
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)

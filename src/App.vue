@@ -140,7 +140,7 @@
       }
     },
     created () {
-      let session = JSON.parse(window.localStorage.getItem('session'))
+      let session = JSON.parse(window.localStorage.getItem('adminsession'))
       // this.notifItems = [
       //   {
       //     title: 'Welcome!'
@@ -222,11 +222,11 @@
             title: 'Users',
             link: '/users'
           },
-          {
-            icon: 'assignment_ind',
-            title: 'Agents',
-            link: '/agents'
-          },
+          // {
+          //   icon: 'assignment_ind',
+          //   title: 'Agents',
+          //   link: '/agents'
+          // },
           {
             icon: 'cast',
             title: 'News',
@@ -242,7 +242,7 @@
         }).then(confirmation => {
           if (confirmation) {
             this.session = []
-            window.localStorage.setItem('session', '[]')
+            window.localStorage.setItem('admsession', '[]')
             d.$router.replace({ name: 'Logout' })
           }
         })

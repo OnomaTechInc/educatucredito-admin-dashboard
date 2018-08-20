@@ -248,7 +248,7 @@ a {
     methods: {
       initialize () {
         var d = this
-        this.session = JSON.parse(localStorage.getItem('session'))
+        this.session = JSON.parse(localStorage.getItem('adminsession'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
         axios.get(window.apiLink + 'news').then(function (response) {
           // localStorage.setItem('session', JSON.stringify(response.data))

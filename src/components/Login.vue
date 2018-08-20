@@ -92,7 +92,7 @@ export default {
             id: uuid.v4()
           })
         } else {
-          localStorage.setItem('session', JSON.stringify(response.data))
+          localStorage.setItem('adminsession', JSON.stringify(response.data))
           d.$emit('setRoleName', response.data)
           if (d.$route.query.redirect !== undefined) {
             d.$router.replace({ path: d.$route.query.redirect })

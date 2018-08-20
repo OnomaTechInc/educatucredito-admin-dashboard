@@ -62,7 +62,7 @@
                     ></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-btn color="error" @click="">Reset password</v-btn>
+                    <v-btn color="error">Reset password</v-btn>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -178,7 +178,7 @@ a {
 
       initialize () {
         var d = this
-        this.session = JSON.parse(localStorage.getItem('session'))
+        this.session = JSON.parse(localStorage.getItem('adminsession'))
         axios.defaults.headers.common['Authorization'] = `bearer ${this.session.api_key}`
         axios.get(window.apiLink + 'users').then(function (response) {
           // localStorage.setItem('session', JSON.stringify(response.data))
