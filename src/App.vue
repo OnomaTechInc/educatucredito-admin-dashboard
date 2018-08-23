@@ -242,7 +242,7 @@
         }).then(confirmation => {
           if (confirmation) {
             this.session = []
-            window.localStorage.setItem('admsession', '[]')
+            window.localStorage.setItem('adminsession', '[]')
             d.$router.replace({ name: 'Logout' })
           }
         })
@@ -289,6 +289,11 @@
 </script>
 
 <style>
+@media only screen and (max-width: 767px) {
+  .v-overlay.v-overlay--active {
+    z-index: 1;
+  }
+}
   .container {
     padding: 0;
   }

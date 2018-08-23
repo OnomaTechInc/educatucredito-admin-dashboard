@@ -34,6 +34,12 @@
                       <v-layout wrap>
                         <v-flex xs12 sm12 md12>
                           <v-btn class="primary" @click="dialog2 = true">Upload video</v-btn>
+                          <div>OR</div>
+                          <v-text-field 
+                            v-model="editedItem.video" 
+                            label="Video URL"
+                            prepend-icon="play_circle_outline" 
+                          ></v-text-field>
                         </v-flex>
                         <v-flex xs12 sm12 md12>
                           <v-text-field 
@@ -112,7 +118,7 @@
           <v-toolbar-title>Drag and drop video here</v-toolbar-title>
           <v-spacer></v-spacer>
           <v-toolbar-items>
-            <v-btn dark flat @click.native='uploadInit'>Start Upload</v-btn>
+            <v-btn dark flat @click.native='uploadInit'>Next</v-btn>
           </v-toolbar-items>
         </v-toolbar>
         <v-progress-linear :indeterminate='true' v-if='startUpload'></v-progress-linear>
@@ -128,7 +134,7 @@
             remove='Remove Video'
             @change='onChange'
             accept='video/mp4,video/webm' 
-            size='10' 
+            size='1024' 
             buttonClass='btn theme--dark primary pa-2 white--text'
             removeButtonClass='btn theme--dark secondary pa-2 white--text'
             :removable='true'
@@ -143,11 +149,15 @@
       max-width="600px"
     >
       <v-card>
+        <div v-if="isYoutube">
+          <iframe width="560" height="315" :src="youtubeURL" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        </div>
         <video-player
           class="video-player-box"
           ref="videoPlayer"
           :options="playerOptions"
           :playsinline="true"
+          v-else
         >
         </video-player>
       </v-card>
@@ -211,6 +221,8 @@ a {
             src: 'https://cdn.theguardian.tv/webM/2015/07/20/150716YesMen_synd_768k_vp8.webm'
           }]
         },
+        isYoutube: false,
+        youtubeURL: '',
         video: '',
         customStrings: {
           'upload': '<p>Your device does not support file uploading.</p>', 
@@ -225,6 +237,7 @@ a {
         loading: true,
         search: '',
         items: [],
+        attached: Object,
         headers: [
           // { text: 'Avatar', value: 'avatar' },
           {
@@ -253,6 +266,7 @@ a {
             d.$parent.$parent.$parent.$parent.editedItem.avatar = event.target.result
           }
           reader.readAsDataURL(val)
+          console.log('aay:', d.$parent.$parent.$parent.$parent)
           d.$parent.$parent.$parent.$parent.photoIsLoaded = true
         }
       }
@@ -273,7 +287,12 @@ a {
     },
     methods: {
       uploadInit () {
-        console.log('uploading...')
+        // console.log('uploading...')
+        var reader = new FileReader()
+        var d = this
+        // console.log('aay:', d.$parent.$parent.$parent.$parent)
+        d.$parent.$parent.$parent.$parent.photoIsLoaded = true
+        this.attached = document.getElementById('uploadFile').files[0]
         this.dialog2 = false
       },
 
@@ -344,7 +363,29 @@ a {
 
       watchItem (item) {
         this.dialog3 = true
-        this.playerOptions.sources[0].src = item.video
+        console.log(item)
+        this.isYoutube = false
+        this.isYoutube = this.validateYouTubeUrl(item.video)
+        if (this.isYoutube === false) {
+          this.playerOptions.sources[0].src = item.video
+        }
+      },
+
+      validateYouTubeUrl(url) {
+        if (url != undefined || url != '') {
+          var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/
+          var match = url.match(regExp)
+          if (match && match[2].length == 11) {
+            // Do anything for being valid
+            // if need to change the url to embed url then use below line
+            this.youtubeURL = 'https://www.youtube.com/embed/' + match[2] + '?autoplay=0'
+            return true
+          }
+          else {
+            return false
+            // Do anything for not being valid
+          }
+        }
       },
 
       editItem (item) {
@@ -379,7 +420,8 @@ a {
 
       close () {
         this.dialog = false
-        document.getElementById('uploadFile').value = ''
+        // document.getElementById('uploadFile').value = ''
+        this.attached = null
         setTimeout(() => {
           this.editedItem = Object.assign({}, this.defaultItem)
           this.editedIndex = -1
@@ -390,7 +432,8 @@ a {
         var data = new FormData()
         var d = this
         var O = Object
-        data.append('file', document.getElementById('uploadFile').files[0])
+        data.append('file', d.attached)
+        console.log(d.editedItem)
         if (this.editedIndex > -1) {
           // O.assign(d.items[d.editedIndex], d.editedItem)
           axios.put(`${window.apiLink}videos/${d.editedItem.id}`, {
@@ -407,7 +450,7 @@ a {
             d.close()
             if (d.photoIsLoaded === true) {
               axios.post(
-                `${window.apiLink}videos/video/${d.editedItem.id}`,
+                `${window.apiLink}videos/upload/${d.editedItem.id}`,
                 data
               ).then(function (res2) {
               }).catch(function (error2) {
@@ -420,11 +463,9 @@ a {
           })
         } else {
           axios.post(`${window.apiLink}videos/`, {
-            email: d.editedItem.email,
-            name: d.editedItem.name,
-            company: d.editedItem.company,
-            position: d.editedItem.position,
-            role: d.editedItem.role
+            title: d.editedItem.title,
+            description: d.editedItem.description,
+            video: d.editedItem.video
           }).then(function (res) {
             // console.log('editedItem: ', d.editedItem)
             d.items.push(d.editedItem)

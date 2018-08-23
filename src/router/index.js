@@ -12,8 +12,8 @@ import News from '@/components/News'
 Vue.use(Router)
 
 function requireAuth(to, from, next) {
-  var authenticated = localStorage.getItem('session')
-  if (authenticated === null) {
+  var authenticated = localStorage.getItem('adminsession')
+  if (authenticated === null || authenticated === '[]') {
     next({
       path: '/login',
       query: {
@@ -26,7 +26,7 @@ function requireAuth(to, from, next) {
 }
 
 export default new Router({
-  mode: 'hash',
+  mode: 'history',
   routes: [{
       path: '/login',
       name: 'Login',
@@ -42,6 +42,12 @@ export default new Router({
       meta: {
         plainLayout: true
       }
+    },
+    {
+      path: '/',
+      name: 'Home',
+      component: Dashboard,
+      beforeEnter: requireAuth
     },
     {
       path: '/dashboard',
